@@ -20,8 +20,6 @@
             <a href="contact.html">Contact Me</a>
             <a href="form-no-js.html">No-JS Form</a>
             <a href="form-with-js.html">JS Form</a>
-            <a href="form-no-js.html">No-JS Form</a>
-            <a href="form-with-js.html">JS Form</a>
             <button type="button" id="theme-toggle" hidden>Switch to dark theme</button>
         </nav>
     </header>
@@ -96,6 +94,16 @@
                 referrerpolicy="strict-origin-when-cross-origin"
                 allowfullscreen></iframe>
         </section>
+
+        <section id="fun-facts" aria-labelledby="fun-facts-heading">
+            <h2 id="fun-facts-heading">Fun Facts</h2>
+            <p>Take a break with a random fact. Use the Show Source button to see where it came from.</p>
+            <fun-fact id="fun-fact">
+                Fun fact: this section requires JavaScript.
+            </fun-fact>
+            <button type="button" id="reveal-toggle" aria-controls="fun-fact">Show Source</button>
+        </section>
+        <script src="component.js"></script>
     </main>
 
     <footer>
