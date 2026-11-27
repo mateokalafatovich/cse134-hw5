@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/form.css">
+    <script src="theme.js"></script>
+    <script src="form.js" defer></script>
+    <title>Personal Site</title>
+</head>
+<body>
+    <header>
+        <a href="index.html">
+            <img src="assets/trident-emblem-emoji.jpg" alt="Mateo Kalafatovich 
+                - home" width="32" height="32">
+        </a>        
+        <nav aria-label="Main Navigation">
+            <a href="latest.html">Latest</a>
+            <a href="interests.html">Interests</a>
+            <a href="contact.html">Contact Me</a>
+            <a href="form-no-js.html">No-JS Form</a>
+            <a href="form-with-js.html">JS Form</a>
+            <button type="button" id="theme-toggle" hidden>Switch to dark theme</button>
+        </nav>
+    </header>
+    <main>
+        <form action="https://httpbin.org/post" method="POST">
+            <h2>Contact Form</h2>
+            <form-field>
+                <label for="name">Name (text)</label><br>
+                <input type="text" id="name" name="name" minlength="1" 
+                    maxlength="100" autocomplete="name" 
+                    placeholder="John Pork" aria-describedby="name-hint name-error" 
+                    required><br>
+                <output id="name-hint" class="hint" for="name">
+                    Must be between 1 and 100 characters.
+                </output><br>
+            </form-field>
+            <form-field>
+                <label for="email">Email (email)</label><br>
+                <input type="email" id="email" name="email" autocomplete="email" 
+                    placeholder="johnpork@gmail.com" aria-describedby="email-error"  
+                    required><br>
+            </form-field>
+            <form-field>
+                <label for="comments">Comments (textarea)</label><br>
+                <textarea id="comments" name="comments" minlength="10" 
+                    maxlength="1000" aria-describedby="comments-hint
+                    comments-error comments-info" required></textarea><br>
+                <output id="comments-hint" class="hint" for="comments">
+                    Must be between 10 and 1000 characters.
+                </output><br>
+            </form-field>
+            <div class="message-areas">
+                <section id="error-area" class="message-area error-area" aria-live="polite">
+                    <p id="error-title" class="message-title" hidden>Error messages</p>
+                    <ul id="error-list"></ul>
+                </section>
+                <section id="info-area" class="message-area info-area" hidden>
+                    <p class="message-title">Information</p>
+                    <p id="comments-info" class="info">
+                        <span id="comments-count"></span>
+                        <span id="comments-status" aria-live="polite"></span>
+                    </p>
+                </section>
+            </div>
+            <form-field>
+                <input type="hidden" name="possible_bot" value="true">
+            </form-field>
+            <form-field>
+                <input type="hidden" name="form-errors">
+            </form-field>
+            <button type="submit">Submit</button>
+        </form>
+    </main>
+    <footer>
+        <noscript>
+            <p>
+                The site still works fine without JavaScript! Connect with me 
+                below if you're tired of AI slop.
+            </p>
+        </noscript>
+        <nav aria-label="Social links">
+            <ul>
+                <li>
+                    <button type="button" aria-label="Copy email address">
+                        Email
+                    </button>
+                </li>
+                <li>
+                    <a href="https://github.com/mateokalafatovich">
+                        GitHub
+                    </a>
+                </li>
+                <li>
+                    <a href="https://www.linkedin.com/in/mateo-adrian-kalafatovich/">
+                        LinkedIn
+                    </a>
+                </li>
+                <li>
+                    <a href="https://www.instagram.com/mateo.kalaf/">
+                        Instagram
+                    </a>
+                </li>
+            </ul>
+        </nav>
+        <p><small>&copy; 2026 Mateo Kalafatovich</small></p>
+    </footer>
+
+</body>
+</html>
