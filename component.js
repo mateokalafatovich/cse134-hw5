@@ -1,24 +1,10 @@
-class TriviaCard extends HTMLElement {
+const API = "https://uselessfacts.jsph.pl/api/v2/facts/random?language=en";
+
+class FunFact extends HTMLElement {
     constructor() {
         super();
-        this._data = [
-            {
-                question: "When did Mateo start playing soccer?",
-                options: ["4", "6", "10", "15"],
-                correctAnswer: "4"
-            },
-            {
-                question: "Why did Mateo first become interested in Computer Science?",
-                options: ["His parents", "High school", "Social media", "Minecraft"],
-                correctAnswer: "Minecraft"
-            },
-            {
-                question: "Which is Mateo's favorite Premier League team?",
-                options: ["Arsenal", "Man City", "Tottenham", "Everton"],
-                correctAnswer: "Tottenham"
-            }
-        ];
-        this._index = 0;
+        this._fact = null;   // last fact that loaded successfully: { text, source, sourceUrl }
+        this._count = 0;     // how many facts have loaded this visit
     }
 
     // Attributes the browser watches
@@ -30,12 +16,13 @@ class TriviaCard extends HTMLElement {
         this.render();
         this.attachEventListeners();
         this.update();
+        this.loadFact();     // request the first fact as soon as the component is on the page
     }
 
     attributeChangedCallback(name) {
-        // If <trivia-card reveal> is written in the HTML, this runs before
-        // connectedCallback()
-        if (name === 'reveal' && this.querySelector('.options')) {
+        // If <fun-fact reveal> is written in the HTML, this runs before
+        // connectedCallback(), when there are no elements to update yet
+        if (name === 'reveal' && this.querySelector('.fact')) {
             this.update();
             this.dispatchEvent(new CustomEvent('reveal-change'));
         }
@@ -46,35 +33,27 @@ class TriviaCard extends HTMLElement {
 
         // Heading
         const heading = document.createElement('h3');
-        heading.textContent = 'Trivia Time';
+        heading.textContent = 'Random Fun Fact';
         this.appendChild(heading);
 
-        // Question text 
-        const question = document.createElement('p');
-        question.className = 'question';
-        this.appendChild(question);
+        // Fact text
+        const fact = document.createElement('p');
+        fact.className = 'fact';
+        this.appendChild(fact);
 
-        // Answer choices, lettered A-D 
-        const options = document.createElement('ol');
-        options.className = 'options';
-        options.type = 'A';
-        this.appendChild(options);
+        // Fact source
+        const source = document.createElement('p');
+        source.className = 'source';
+        this.appendChild(source);
 
-        // Previous button
-        const prevBtn = document.createElement('button');
-        prevBtn.type = 'button';
-        prevBtn.className = 'prev';
-        prevBtn.textContent = 'Previous question';
-        this.appendChild(prevBtn);
+        // Get fact button
+        const factBtn = document.createElement('button');
+        factBtn.type = 'button';
+        factBtn.className = 'get-fact';
+        factBtn.textContent = 'Get a new fact';
+        this.appendChild(factBtn);
 
-        // Next button
-        const nextBtn = document.createElement('button');
-        nextBtn.type = 'button';
-        nextBtn.className = 'next';
-        nextBtn.textContent = 'Next question';
-        this.appendChild(nextBtn);
-
-        // Status message, e.g. "Question 2 of 3"
+        // Status message for loading, success, and failure
         const status = document.createElement('p');
         status.className = 'status';
         status.setAttribute('role', 'status');
@@ -82,69 +61,108 @@ class TriviaCard extends HTMLElement {
     }
 
     attachEventListeners() {
-        const prev = this.querySelector('.prev');
-        const next = this.querySelector('.next');
-        prev.addEventListener('click', () => {
-            this.showQuestion((this._index-1 + this._data.length) % this._data.length);
+        const factBtn = this.querySelector('.get-fact');
+        factBtn.addEventListener('click', () => {
+            this.loadFact();
         });
-        next.addEventListener('click', () => {
-            this.showQuestion((this._index+1) % this._data.length);
-        });
-    }
-
-    // Switch to a question and hide its answer again
-    showQuestion(newIndex) {
-        this._index = newIndex;
-        this.removeAttribute('reveal');
-        this.update();
     }
 
     update() {
-        // Get question object
-        const item = this._data[this._index];
         const revealed = this.hasAttribute('reveal');
 
-        // Update question
-        const question = this.querySelector('.question');
-        question.textContent = item['question'];
+        // Update fact text (textContent, so remote text is never read as HTML)
+        const fact = this.querySelector('.fact');
+        fact.textContent = this._fact ? this._fact.text : 'Your first fact is on its way…';
 
-        // Update options
-        const options = this.querySelector('.options');
-        options.replaceChildren();
-        item.options.forEach(option => {
-            const answerChoice = document.createElement('li');
-            if (revealed && option === item.correctAnswer) {
-                // Highlight the correct choice while the reveal attribute is set
-                const highlight = document.createElement('mark');
-                highlight.textContent = option;
-                answerChoice.appendChild(highlight);
-            } else {
-                answerChoice.textContent = option;
-            }
-            options.appendChild(answerChoice);
-        });
-
-        // Update status
-        const status = this.querySelector('.status');
-        status.textContent = `Question ${this._index+1} of ${this._data.length}`;
+        // Update source: hidden unless the reveal attribute is set
+        const source = this.querySelector('.source');
+        source.hidden = !revealed;
+        source.replaceChildren();
+        if (!this._fact) {
+            source.textContent = 'Source: no fact loaded yet.';
+        } else if (this._fact.sourceUrl) {
+            source.append('Source: ');
+            const link = document.createElement('a');
+            link.href = this._fact.sourceUrl;
+            link.textContent = this._fact.source;
+            source.appendChild(link);
+        } else {
+            source.textContent = `Source: ${this._fact.source}`;
+        }
     }
 
+    setStatus(message) {
+        this.querySelector('.status').textContent = message;
+    }
+
+    async loadFact() {
+        const factBtn = this.querySelector('.get-fact');
+        const fact = this.querySelector('.fact');
+
+        // prevent double requests
+        factBtn.disabled = true;
+        fact.setAttribute('aria-busy', 'true');
+        this.setStatus('Loading a new fact…');
+
+        try {
+            const response = await fetch(API);
+            if (!response.ok) {
+                throw new Error(`HTTP status ${response.status}`);
+            }
+            const data = await response.json();  
+            if (typeof data?.text !== 'string' || typeof data?.source !== 'string') {
+                throw new Error('Expected text and source in the response.');
+            }
+
+            // Success: save the fact, hide the previous fact's source, and show it
+            this._fact = {
+                text: data.text,
+                source: data.source,
+                sourceUrl: FunFact.safeUrl(data.source_url)
+            };
+            this._count++;
+            this.removeAttribute('reveal');
+            this.update();
+            this.setStatus(`Fact ${this._count} loaded.`);
+        } catch (err) {
+            // Failure: keep the previous fact on screen and explain how to retry
+            console.error('Could not load a fact.', err);
+            this.setStatus('Could not load a new fact. Check your connection, then select "Get a new fact" to try again.');
+        } finally {
+            // Runs after success or failure: restore the control so the visitor can retry
+            factBtn.disabled = false;
+            fact.removeAttribute('aria-busy');
+        }
+    }
+
+    // Returns the URL only if it is a valid https: link, otherwise null
+    static safeUrl(value) {
+        if (typeof value !== 'string') {
+            return null;
+        }
+        try {
+            const url = new URL(value);
+            return url.protocol === 'https:' ? url.href : null;
+        } catch {
+            return null;
+        }
+    }
 }
 
-customElements.define('trivia-card', TriviaCard);
+customElements.define('fun-fact', FunFact);
 
 // Page control: a button OUTSIDE the component toggles its observed `reveal` attribute
-const triviaCard = document.querySelector('#trivia-card');
+const funFact = document.querySelector('#fun-fact');
 const revealToggle = document.querySelector('#reveal-toggle');
 
-if (triviaCard && revealToggle) {
+if (funFact && revealToggle) {
     revealToggle.addEventListener('click', () => {
-        triviaCard.toggleAttribute('reveal');
+        funFact.toggleAttribute('reveal');
     });
 
     // Runs whenever `reveal` changes, whether from this button or from the
-    // card's Previous/Next buttons hiding the answer again
-    triviaCard.addEventListener('reveal-change', () => {
-        revealToggle.textContent = triviaCard.hasAttribute('reveal') ? 'Hide Answer' : 'Reveal Answer';
+    // component hiding the source again after a new fact loads
+    funFact.addEventListener('reveal-change', () => {
+        revealToggle.textContent = funFact.hasAttribute('reveal') ? 'Hide Source' : 'Show Source';
     });
 }
