@@ -14,6 +14,8 @@ Inside of the Astro project, you'll see the following folders and files:
 └── package.json
 ```
 
+The two pages to review are index.astro, the homage page, and contact.astro, the contact page. They both reuse the Footer component.
+
 ## Commands
 
 All commands are run from the root of the project, from a terminal:
