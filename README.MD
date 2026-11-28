@@ -1,4 +1,5 @@
 # Astro Project
+The SSG exercise is all within ssg-exercise/.
 
 ## Project Structure
 
@@ -21,7 +22,7 @@ The two pages to review are index.astro, the homage page, and contact.astro, the
 
 ## Commands
 
-All commands are run from /ssg, from a terminal:
+All commands are run from /ssg-exercise, from a terminal:
 
 | Command                   | Action                                           |
 | :------------------------ | :----------------------------------------------- |
