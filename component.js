@@ -121,7 +121,6 @@ class FunFact extends HTMLElement {
                 sourceUrl: FunFact.safeUrl(data.source_url)
             };
             this._count++;
-            this.removeAttribute('reveal');
             this.update();
             this.setStatus(`Fact ${this._count} loaded.`);
         } catch (err) {
@@ -151,18 +150,55 @@ class FunFact extends HTMLElement {
 
 customElements.define('fun-fact', FunFact);
 
+/* Use local storage */
+
+const SOURCE_KEY = 'hw5-fun-fact-source';
+const SOURCE_DEFAULT = 'hidden';
+
+function readSourcePref() {
+    try { 
+        const saved = localStorage.getItem(SOURCE_KEY);
+        return saved === 'shown' || saved === 'hidden' ? saved : SOURCE_DEFAULT;
+    } catch(err) {
+        console.warn('The fun fact source preference could not be read.', err);
+        return SOURCE_DEFAULT;
+    }
+}
+
+function saveSourcePref(value) {
+    try { 
+        localStorage.setItem(SOURCE_KEY, value);
+    } catch(err) {
+        console.warn('The fun fact source preference could not be saved.', err);
+    }
+}
+
+function applySourcePref(value) {
+    funFact.toggleAttribute('reveal', value === 'shown');
+}
+
+function updateLabel() {
+    revealToggle.textContent = funFact.hasAttribute('reveal') ? 'Hide Source' : 'Show Source';
+}
+
+
 // Page control: a button OUTSIDE the component toggles its observed `reveal` attribute
 const funFact = document.querySelector('#fun-fact');
 const revealToggle = document.querySelector('#reveal-toggle');
 
 if (funFact && revealToggle) {
     revealToggle.addEventListener('click', () => {
-        funFact.toggleAttribute('reveal');
+        const next = funFact.hasAttribute('reveal') ? 'hidden' : 'shown';
+        applySourcePref(next);
+        saveSourcePref(next);
     });
 
     // Runs whenever `reveal` changes, whether from this button or from the
     // component hiding the source again after a new fact loads
     funFact.addEventListener('reveal-change', () => {
-        revealToggle.textContent = funFact.hasAttribute('reveal') ? 'Hide Source' : 'Show Source';
+        updateLabel();
     });
+
+    applySourcePref(readSourcePref());
+    updateLabel();
 }
