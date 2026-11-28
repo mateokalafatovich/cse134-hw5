@@ -6,7 +6,7 @@ Inside of the Astro project, you'll see the following folders and files:
 
 ```text
 /
-├── ssg/
+├── ssg-exercise/
     ├── public/
     ├── src/
     │    │──components/
