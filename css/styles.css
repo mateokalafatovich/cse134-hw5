@@ -245,6 +245,33 @@ button[id="theme-toggle"] {
     background: var(--color-button-bg);
 }
 
+/*
+Fun fact Web Component.
+*/
+fun-fact {
+    --fun-fact-bg: var(--color-article);
+    --fun-fact-text: var(--color-text);
+    --fun-fact-border: var(--color-border);
+    --fun-fact-button-bg: var(--color-button-bg);
+    --fun-fact-button-text: var(--color-button-text);
+    --fun-fact-focus: var(--color-focus);
+}
+
+/* Page control for the component */
+#reveal-toggle {
+    font: inherit;
+    padding: 0.25em 0.75em;
+    border-radius: 0.375rem;
+    border: 1px solid var(--color-border);
+    color: var(--color-button-text);
+    background-color: var(--color-button-bg);
+    cursor: pointer;
+}
+
+#reveal-toggle:focus {
+    outline-color: var(--color-focus);
+}
+
 /* Media query */
 @media (max-width: 700px) {
     .project-grid {

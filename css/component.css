@@ -1,0 +1,64 @@
+/* The card: mirrors the site's article cards */
+fun-fact {
+    display: block;
+    margin-bottom: var(--space, 1rem);
+    padding: var(--space, 1rem);
+    border: 2px solid var(--fun-fact-border, #000000);
+    color: var(--fun-fact-text, #01016b);
+    background-color: var(--fun-fact-bg, #ffffff);
+}
+
+/* Fact text: larger than the site's smaller "h3 + p" subtitle style */
+fun-fact .fact {
+    font-size: 1.1rem;
+    margin-bottom: 0.75em;
+}
+
+/* Dim the old fact while a new one is loading */
+fun-fact .fact[aria-busy="true"] {
+    opacity: 0.6;
+}
+
+/* Source line, shown when the reveal attribute is set */
+fun-fact .source {
+    font-size: 0.9rem;
+    font-style: italic;
+}
+
+fun-fact a {
+    color: var(--fun-fact-text, #01016b);
+}
+
+fun-fact a:hover {
+    text-decoration-thickness: 0.15em;
+}
+
+/* Status message: smaller, like the site's secondary text */
+fun-fact .status {
+    font-size: 0.9rem;
+    margin: var(--space, 1rem) 0 0;
+}
+
+/* Get a new fact button: mirrors the site's theme toggle button */
+fun-fact button {
+    font: inherit;
+    padding: 0.25em 0.75em;
+    border-radius: 0.375rem;
+    border: 1px solid var(--fun-fact-border, #000000);
+    color: var(--fun-fact-button-text, #ffffff);
+    background-color: var(--fun-fact-button-bg, #01016b);
+    cursor: pointer;
+}
+
+/* While a request is pending, the button is disabled */
+fun-fact button:disabled {
+    opacity: 0.6;
+    cursor: progress;
+}
+
+/* Focus indicator: same size and offset as the rest of the site */
+fun-fact a:focus,
+fun-fact button:focus {
+    outline: 3px solid var(--fun-fact-focus, #01016b);
+    outline-offset: 2px;
+}
